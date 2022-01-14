@@ -7,10 +7,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-
-/*
-* make mock class changed to object class
-* */
 class ShopListApiMock : ShopListApi {
     override suspend fun getShopLists(): List<ShopListResponse> =
         coroutineScope {
@@ -25,10 +21,6 @@ class ShopListApiMock : ShopListApi {
 
     override suspend fun getShopListItems(listId: String): List<ShopListItemResponse> =
         coroutineScope {
-
-            /*
-            * use delay instead of sleap to make other routine cooperate with each other not stop our thread
-            * */
             Thread.sleep(2)
             List(5) { index ->
                 ShopListItemResponse(
@@ -39,10 +31,6 @@ class ShopListApiMock : ShopListApi {
             }
         }
 
-
-    /*
-    * u can use flowOn()to make it run in io
-    * */
     override fun getUpdateEvents(): Flow<String> = flow {
         var counter = 0
         while (true) {

@@ -14,33 +14,13 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-
-    /*
-    * case :- when viewmodel cleared the instance for repository is still exist
-    * solution :- assign it to null in onCleared()
-    * */
-
     private val shopListRepository = ShopListRepository(ShopListApiMock())
-
-
-    /*
-    * case:-  user can in fragment assign value for shopLists live data
-    * desc:- shopLists must be LiveData and had only get assign to  another mutable live data variable
-    * */
     val shopLists = MutableLiveData<List<Pair<ShopListResponse, List<ShopListItemResponse>>>>()
     private val eventLiveData = MutableLiveData<String>()
 
     init {
-
-        /*
-        * getShopLists() should use io dispatcher as it may take some time
-        * */
-
         viewModelScope.launch {
             val lists = shopListRepository.getShopLists()
-            /*
-            * you can use mapper class to map the two DTO objects to one ui model
-            * */
             val data = mutableListOf<Pair<ShopListResponse, List<ShopListItemResponse>>>()
             for (list in lists) {
                 val items = shopListRepository.getShopListItems(list.list_id)
@@ -56,10 +36,6 @@ class MainViewModel : ViewModel() {
 
     private fun getUpdateEvents() {
 
-        /*
-        * case :- use globalScope.launch will still running although our viewmodel is cleaned
-        * Solution :- make viewmodel implement CoroutineScope and make job for it and close the job in onclean function or use viewModelScope
-        * */
         GlobalScope.launch() {
             shopListRepository.updateEvents().collect {
                 eventLiveData.postValue(it)
